@@ -71,5 +71,6 @@ node_modules/
 # Local IDE and build output
 .idea/
 build/
+backend/target/
 
 oceanresort/

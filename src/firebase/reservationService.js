@@ -1,24 +1,34 @@
-import {
-  collection,
-  addDoc,
-  getDoc,
-  getDocs,
-  doc,
-  query,
-  where,
-  orderBy,
-  serverTimestamp,
-  updateDoc,
-} from 'firebase/firestore';
-import { db } from './config';
+import { getAuthToken } from './authService';
 
-const RESERVATIONS = 'reservations';
+const API_BASE = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';
 const ROOM_RATES = {
   standard: 8500,
   deluxe: 12000,
   suite: 18000,
   family: 15000,
 };
+
+async function apiRequest(path, options = {}) {
+  const token = getAuthToken();
+  const headers = {
+    ...(options.headers || {}),
+    Authorization: token ? `Bearer ${token}` : '',
+  };
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const err = new Error(body.message || 'Request failed');
+    if (response.status === 401 || response.status === 403) {
+      err.code = 'permission-denied';
+    }
+    throw err;
+  }
+  return response.status === 204 ? null : response.json();
+}
 
 export function getRoomRates() {
   return ROOM_RATES;
@@ -36,61 +46,53 @@ function nightsBetween(checkIn, checkOut) {
 }
 
 export async function addReservation(data) {
-  const ref = await addDoc(collection(db, RESERVATIONS), {
-    ...data,
-    createdAt: serverTimestamp(),
-    status: 'confirmed',
+  const result = await apiRequest('/reservations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ...data,
+      status: 'confirmed',
+    }),
   });
-  return ref.id;
+  return result.id;
 }
 
 export async function getReservationById(id) {
-  const ref = doc(db, RESERVATIONS, id);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
-}
-
-export async function getReservationByNumber(reservationNumber) {
-  const q = query(
-    collection(db, RESERVATIONS),
-    where('reservationNumber', '==', reservationNumber)
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  const first = snap.docs[0];
-  return { id: first.id, ...first.data() };
-}
-
-export async function getAllReservations() {
   try {
-    const q = query(
-      collection(db, RESERVATIONS),
-      orderBy('createdAt', 'desc')
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return await apiRequest(`/reservations/${id}`);
   } catch (err) {
-    if (err?.code === 'permission-denied') throw err;
-    const snap = await getDocs(collection(db, RESERVATIONS));
-    const list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    list.sort((a, b) => {
-      const ta = a.createdAt?.toMillis?.() ?? a.createdAt ?? 0;
-      const tb = b.createdAt?.toMillis?.() ?? b.createdAt ?? 0;
-      return tb - ta;
-    });
-    return list;
+    if (err.message?.toLowerCase().includes('not found')) return null;
+    throw err;
   }
 }
 
+export async function getReservationByNumber(reservationNumber) {
+  try {
+    return await apiRequest(`/reservations/by-number/${encodeURIComponent(reservationNumber)}`);
+  } catch (err) {
+    if (err.message?.toLowerCase().includes('not found')) return null;
+    throw err;
+  }
+}
+
+export async function getAllReservations() {
+  return apiRequest('/reservations');
+}
+
 export async function updateReservation(id, data) {
-  const ref = doc(db, RESERVATIONS, id);
-  await updateDoc(ref, { ...data, updatedAt: serverTimestamp() });
+  await apiRequest(`/reservations/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updateReservationStatus(id, status) {
-  const ref = doc(db, RESERVATIONS, id);
-  await updateDoc(ref, { status, updatedAt: serverTimestamp() });
+  await apiRequest(`/reservations/${id}/status`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
 }
 
 export function calculateBill(reservation) {

@@ -26,6 +26,68 @@ Additional: **Dashboard** with quick actions and recent reservations list.
 
 ## Setup
 
+## Java Backend (New Architecture)
+
+The system now uses:
+- **React frontend** for UI
+- **Java Spring Boot backend** for authentication and reservation APIs
+- **Firebase (same project)** as the database and auth provider
+
+Frontend no longer reads/writes Firestore directly. All reservation operations go through the Java backend.
+
+### Backend prerequisites
+
+- Java 17+
+- Maven 3.9+
+- Firebase service account JSON file (from Firebase Console -> Project Settings -> Service accounts)
+- Firebase Web API key (from Firebase Console -> Project Settings -> Your apps -> Web app -> `apiKey`)
+
+### Backend environment variables
+
+Set these before running backend:
+
+```
+FIREBASE_SERVICE_ACCOUNT_PATH=D:\path\to\serviceAccountKey.json
+FIREBASE_WEB_API_KEY=your_firebase_web_api_key
+```
+
+You can use `backend/.env.example` as reference.
+
+### Run backend
+
+```bash
+cd backend
+mvn spring-boot:run
+```
+
+Backend starts at `http://localhost:8080`.
+
+Health check:
+
+```bash
+http://localhost:8080/api/health
+```
+
+### Frontend environment
+
+Create/update `.env` in project root:
+
+```
+REACT_APP_API_BASE_URL=http://localhost:8080/api
+```
+
+You can use `.env.example` as reference.
+
+### Run frontend
+
+```bash
+cd ..
+npm install
+npm start
+```
+
+Frontend runs at `http://localhost:3000` and uses the Java backend for login + reservation APIs.
+
 ### 1. Clone / open project and install dependencies
 
 ```bash
@@ -42,24 +104,19 @@ npm install
 
 ### 3. Environment variables
 
-Copy the example env file and fill in your Firebase config:
+Copy the example env file:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` and set (use the **exact** values from Firebase Console; no quotes, no spaces around `=`):
+Edit `.env` and set:
 
 ```
-REACT_APP_FIREBASE_API_KEY=your_api_key
-REACT_APP_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-REACT_APP_FIREBASE_PROJECT_ID=your_project_id
-REACT_APP_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-REACT_APP_FIREBASE_APP_ID=your_app_id
+REACT_APP_API_BASE_URL=http://localhost:8080/api
 ```
 
-**Important:** Use the API key from **Firebase Console** → Project settings (gear) → **Your apps** → your Web app → config (`apiKey`). Do **not** use a key created only in Google Cloud Console unless you copied it from the Firebase Web app config.
+This tells React to call the Java backend instead of direct Firebase SDK calls.
 
 ### 4. Firestore security rules (required)
 
@@ -148,11 +205,11 @@ Tax: 10% on subtotal.
 
 - `src/App.js` — Routes and protected route wrapper  
 - `src/context/AuthContext.js` — Auth state  
-- `src/firebase/config.js` — Firebase app, auth, Firestore  
-- `src/firebase/authService.js` — Login, logout, auth subscription  
-- `src/firebase/reservationService.js` — Reservations and bill logic  
+- `src/firebase/authService.js` — Frontend auth session + backend login API calls  
+- `src/firebase/reservationService.js` — Reservation API calls to Java backend  
 - `src/components/Layout.js` — Header, nav, outlet (mobile menu)  
 - `src/pages/` — Login, Dashboard, AddReservation, ViewReservation, Bill, Help  
+- `backend/` — Java Spring Boot API using Firebase Admin SDK
 
 ## Documentation (diagrams)
 
@@ -161,6 +218,7 @@ In the `docs` folder at the project root:
 - **USE_CASE_DIAGRAM.md** — Use cases and PlantUML for use case diagram  
 - **CLASS_DIAGRAM.md** — Classes and PlantUML for class diagram  
 - **SEQUENCE_DIAGRAM.md** — Sequence diagrams (Login, Add Reservation, View Reservation, Calculate Bill, Exit)  
+- **RUN_AND_ARCHITECTURE.md** — End-to-end run instructions, architecture flow, and folder structure
 
 ## Build for production
 
@@ -183,19 +241,20 @@ Serve the `build` folder with any static host (e.g. Firebase Hosting, Netlify, V
 
 ### "auth/api-key-not-valid" or "Please pass a valid API key"
 
-1. **Use the Web app key from Firebase**  
-   In [Firebase Console](https://console.firebase.google.com) → your project → **Project settings** (gear) → **General** → **Your apps** → select your **Web** app. Copy the `apiKey` from the `firebaseConfig` object (or "Config" snippet). Paste that **exact** value into `.env` as `REACT_APP_FIREBASE_API_KEY=...`. Do not use a key from **Google Cloud Console → Credentials** unless it is the same key shown for your Firebase Web app.
+1. **Set backend key correctly**  
+   In [Firebase Console](https://console.firebase.google.com) → your project → **Project settings** (gear) → **General** → **Your apps** → select your **Web** app. Copy `apiKey` and set it in backend environment variable:
+   `FIREBASE_WEB_API_KEY=...`
 
 2. **Check API key restrictions**  
    In [Google Cloud Console](https://console.cloud.google.com/apis/credentials) → select your Firebase project → **Credentials** → open the API key used by your Web app.  
-   - Under **Application restrictions**: if set to "HTTP referrers", add `http://localhost:3000/*` and `http://127.0.0.1:3000/*` so local development works.  
+   - Under **Application restrictions**: for backend development, use no referrer restriction or allow server usage.
    - Under **API restrictions**: if "Restrict key" is on, ensure **Identity Toolkit API** (Firebase Auth) is in the list. Or use "Don't restrict key" for development.
 
 3. **Enable Identity Toolkit API**  
    In [Google Cloud Console](https://console.cloud.google.com/apis/library) → search "Identity Toolkit API" → enable it for your project.
 
-4. **No quotes or spaces in `.env`**  
-   Use `REACT_APP_FIREBASE_API_KEY=AIza...` not `REACT_APP_FIREBASE_API_KEY="AIza..."`. Restart the dev server after changing `.env`.
+4. **Restart backend after changing env vars**  
+   Stop and run `mvn spring-boot:run` again so new backend env values are loaded.
 
 ## License
 
