@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllReservations } from '../firebase/reservationService';
+import { useAuth } from '../context/AuthContext';
 import './Dashboard.css';
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -12,9 +14,29 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
+
+    if (!user) {
+      setReservations([]);
+      setLoading(false);
+      return () => { cancelled = true; };
+    }
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     async function load() {
       try {
-        const data = await getAllReservations();
+        let data;
+        try {
+          data = await getAllReservations();
+        } catch (e) {
+          if (e?.code === 'permission-denied') {
+            // First-login token race: short wait and one retry.
+            await sleep(450);
+            data = await getAllReservations();
+          } else {
+            throw e;
+          }
+        }
         if (!cancelled) setReservations(data);
       } catch (e) {
         if (!cancelled) {
@@ -29,7 +51,7 @@ export default function Dashboard() {
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [user]);
 
   const filtered = useMemo(() => {
     let list = reservations;

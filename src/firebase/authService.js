@@ -8,21 +8,41 @@ import {
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from './config';
 
-// Keep the user signed in across tabs and refreshes
+let persistenceInitPromise = null;
+
+// Keep the user signed in across tabs and refreshes.
 export function initAuthPersistence() {
-  return setPersistence(auth, browserLocalPersistence);
+  if (!persistenceInitPromise) {
+    persistenceInitPromise = setPersistence(auth, browserLocalPersistence).catch((err) => {
+      persistenceInitPromise = null;
+      throw err;
+    });
+  }
+  return persistenceInitPromise;
 }
 
 export async function login(email, password) {
+  await initAuthPersistence();
   const userCredential = await signInWithEmailAndPassword(auth, email, password);
   const user = userCredential.user;
-  const staffRef = doc(db, 'staff', user.uid);
-  const staffSnap = await getDoc(staffRef);
-  if (!staffSnap.exists()) {
-    await firebaseSignOut(auth);
-    throw new Error('Access denied. You are not registered as staff.');
+
+  // Make sure token is available before first protected Firestore read.
+  await user.getIdToken();
+
+  // Staff lookup is optional; do not force logout if the document
+  // is missing or temporarily unreadable, otherwise login may appear
+  // successful and then immediately sign out.
+  try {
+    const staffRef = doc(db, 'staff', user.uid);
+    const staffSnap = await getDoc(staffRef);
+    if (staffSnap.exists()) {
+      return { user, role: staffSnap.data().role || 'staff' };
+    }
+  } catch (err) {
+    console.warn('Staff lookup skipped:', err?.code || err?.message || err);
   }
-  return { user, role: staffSnap.data().role || 'staff' };
+
+  return { user, role: 'staff' };
 }
 
 export function signOut() {

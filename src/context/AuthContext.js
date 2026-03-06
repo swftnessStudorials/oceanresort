@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { subscribeToAuth, initAuthPersistence, signOut as firebaseSignOut } from '../firebase/authService';
 
 const AuthContext = createContext(null);
@@ -6,46 +6,44 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const unsubscribeRef = useRef(null);
-  const logoutRequestedRef = useRef(false);
-  const hasUserRef = useRef(false);
 
   const setUserFromLogin = useCallback((firebaseUser) => {
-    hasUserRef.current = true;
-    setUser(firebaseUser);
-    setLoading(false);
+    setUser(firebaseUser || null);
   }, []);
 
-  const logout = useCallback(() => {
-    logoutRequestedRef.current = true;
-    firebaseSignOut();
+  const logout = useCallback(async () => {
+    // Clear UI state immediately so protected routes redirect right away.
+    setUser(null);
+    setLoading(false);
+    try {
+      await firebaseSignOut();
+    } catch (e) {
+      console.error('Sign out failed:', e);
+    }
   }, []);
 
   useEffect(() => {
-    unsubscribeRef.current = subscribeToAuth((firebaseUser) => {
-      if (firebaseUser) {
-        hasUserRef.current = true;
-        logoutRequestedRef.current = false;
-        setUser(firebaseUser);
-        setLoading(false);
-      } else {
-        // Only accept "logged out" when user clicked Exit System. Ignore null from token refresh failure.
-        if (logoutRequestedRef.current) {
-          logoutRequestedRef.current = false;
-          hasUserRef.current = false;
-          setUser(null);
-          setLoading(false);
-        } else if (!hasUserRef.current) {
-          setUser(null);
-          setLoading(false);
-        }
-      }
-    });
+    let unsubscribe = null;
+    let active = true;
 
-    initAuthPersistence();
+    (async () => {
+      try {
+        await initAuthPersistence();
+      } catch (e) {
+        console.error('Failed to initialize auth persistence:', e);
+      }
+
+      if (!active) return;
+      unsubscribe = subscribeToAuth((firebaseUser) => {
+        if (!active) return;
+        setUser(firebaseUser || null);
+        setLoading(false);
+      });
+    })();
 
     return () => {
-      if (unsubscribeRef.current) unsubscribeRef.current();
+      active = false;
+      if (unsubscribe) unsubscribe();
     };
   }, []);
 
