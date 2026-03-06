@@ -1,0 +1,13 @@
+// DEVELOPMENT ONLY — allows all read/write. Use so the app works when Firebase Auth session is invalid.
+// Do NOT use in production. Switch to firestore.rules when auth is fixed.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /reservations/{id} {
+      allow read, write: if true;
+    }
+    match /staff/{userId} {
+      allow read, write: if true;
+    }
+  }
+}

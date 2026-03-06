@@ -1,0 +1,95 @@
+.bill-page .search-form {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.bill-page .search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+}
+
+.bill-page .error-msg {
+  color: var(--error);
+  margin-bottom: 1rem;
+}
+
+.bill-card.card {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 420px;
+  margin-bottom: 1.5rem;
+}
+
+.bill-card h2 {
+  font-size: 1.2rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.bill-guest {
+  margin-bottom: 0.25rem;
+}
+
+.bill-dates {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.bill-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bill-table td {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--sand-dark);
+}
+
+.bill-table td:last-child {
+  text-align: right;
+  font-weight: 500;
+}
+
+.bill-table .total-row td {
+  border-bottom: none;
+  font-weight: 700;
+  font-size: 1.1rem;
+  padding-top: 0.75rem;
+}
+
+.bill-actions {
+  margin-top: 1.25rem;
+}
+
+.room-rates-info {
+  background: var(--sand);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  max-width: 360px;
+}
+
+.room-rates-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: var(--text);
+}
+
+.room-rates-info ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.room-rates-info li {
+  padding: 0.25rem 0;
+  font-size: 0.95rem;
+}

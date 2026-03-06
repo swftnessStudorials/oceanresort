@@ -1,0 +1,47 @@
+.help-page .help-content {
+  background: var(--white);
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 720px;
+}
+
+.help-content section {
+  margin-bottom: 1.5rem;
+}
+
+.help-content section:last-child {
+  margin-bottom: 0;
+}
+
+.help-content h2 {
+  font-size: 1.1rem;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.help-content p {
+  margin-bottom: 0.5rem;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.help-content ul {
+  margin: 0.5rem 0 1rem 1.25rem;
+  padding: 0;
+}
+
+.help-content li {
+  margin-bottom: 0.35rem;
+}
+
+.help-content a {
+  color: var(--primary-light);
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .help-page .help-content {
+    padding: 1.25rem;
+  }
+}

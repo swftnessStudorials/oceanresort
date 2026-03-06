@@ -1,0 +1,220 @@
+.dashboard-stats {
+  margin-bottom: 2rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: var(--white);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-align: center;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.stat-confirmed .stat-value { color: var(--success); }
+.stat-upcoming .stat-value { color: var(--primary-light); }
+.stat-cancelled .stat-value { color: var(--text-muted); }
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-header h2 {
+  margin-bottom: 0;
+}
+
+.reservation-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  min-width: 200px;
+}
+
+.filter-select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.status-confirmed {
+  background: #d8f3dc;
+  color: var(--success);
+}
+
+.status-cancelled {
+  background: var(--sand);
+  color: var(--text-muted);
+}
+
+.row-cancelled {
+  opacity: 0.75;
+}
+
+.link-edit {
+  font-weight: 500;
+  color: var(--primary-light);
+}
+
+.link-edit:hover {
+  text-decoration: underline;
+}
+
+.quick-link-icon {
+  font-size: 1.5rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  color: var(--primary-dark);
+  margin-bottom: 0.35rem;
+}
+
+.page-intro {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.quick-links {
+  margin-bottom: 2rem;
+}
+
+.quick-links h2,
+.recent-reservations h2 {
+  font-size: 1.15rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.quick-link-card {
+  background: var(--white);
+  padding: 1.25rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid transparent;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.quick-link-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 6px 24px rgba(10, 77, 104, 0.15);
+  text-decoration: none;
+  color: var(--text);
+}
+
+.quick-link-card h3 {
+  font-size: 1rem;
+  margin-bottom: 0.35rem;
+  color: var(--primary);
+}
+
+.quick-link-card p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.recent-reservations .loading-msg,
+.recent-reservations .error-msg,
+.recent-reservations .empty-msg {
+  padding: 1rem;
+  background: var(--sand);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+
+.recent-reservations .error-msg {
+  color: var(--error);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--white);
+}
+
+.reservations-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.reservations-table th,
+.reservations-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--sand-dark);
+}
+
+.reservations-table th {
+  background: var(--primary);
+  color: var(--white);
+  font-weight: 600;
+}
+
+.reservations-table tbody tr:hover {
+  background: var(--sand);
+}
+
+@media (max-width: 600px) {
+  .reservations-table th,
+  .reservations-table td {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+}

@@ -1,0 +1,146 @@
+.add-reservation.page .page-intro {
+  margin-bottom: 1.5rem;
+}
+
+.reservation-form {
+  max-width: 560px;
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-row label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+.form-row input,
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+}
+
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.form-row input.readonly {
+  background: var(--sand);
+  color: var(--text-muted);
+}
+
+.input-with-action {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-with-action input {
+  flex: 1;
+}
+
+.form-row.double {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .form-row.double {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-message {
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.form-message.success {
+  background: #d8f3dc;
+  color: var(--success);
+}
+
+.form-message.error {
+  background: #ffe5e5;
+  color: var(--error);
+}
+
+.form-actions {
+  margin-top: 1.25rem;
+}
+
+.form-actions-multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-danger {
+  padding: 0.75rem 1.25rem;
+  background: #b91c1c;
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #991b1b;
+  opacity: 0.95;
+}
+
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.95;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  padding: 0.65rem 1rem;
+  background: var(--sand);
+  color: var(--primary);
+  border: 1px solid var(--sand-dark);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.btn-secondary:hover {
+  background: var(--sand-dark);
+}
